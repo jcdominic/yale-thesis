@@ -151,3 +151,69 @@ class LogNormalDistribution(Distribution):
     def inverse_cdf(self, q):
         """Return x such that F(x)=q (a.k.a. the quantile function)."""
         return self.dist.ppf(q)
+    
+
+from tests.base_tester import BaseTester
+
+class UniformTester(BaseTester):
+    """Tester for Uniform distributions."""
+    
+    def __init__(self, seed=22):
+        super().__init__(seed)
+        self.dist_type = "uniform"
+    
+    def get_distribution(self, epsilon):
+        """Get a uniform mixture distribution with the given epsilon."""
+        dist1 = UniformDistribution(0, 1)
+        safe_epsilon = max(epsilon, 0.001)  # Avoid division by zero
+        dist2_low = (1 / safe_epsilon) ** 2
+        dist2_high = dist2_low + 1
+        dist2 = UniformDistribution(dist2_low, dist2_high)
+        return MixtureDistribution(dist1, dist2, p1=(1-epsilon))
+    
+    def test_multiple_cases(self, epsilon_values, alpha_values, num_samples=1000):
+        """Test multiple cases with uniform distributions."""
+        return super().test_multiple_cases(
+            self.get_distribution, epsilon_values, alpha_values, num_samples
+        )
+
+class GaussianTester(BaseTester):
+    """Tester for Gaussian distributions."""
+    
+    def __init__(self, seed=22):
+        super().__init__(seed)
+        self.dist_type = "gaussian"
+    
+    def get_distribution(self, epsilon):
+        """Get a Gaussian mixture distribution with the given epsilon."""
+        dist1 = GaussianDistribution(1, 1)
+        safe_epsilon = max(epsilon, 0.001)
+        dist2_mean = 2 ** (1 / safe_epsilon)
+        dist2 = GaussianDistribution(dist2_mean, 1)
+        return MixtureDistribution(dist1, dist2, p1=(1-epsilon))
+    
+    def test_multiple_cases(self, epsilon_values, alpha_values, num_samples=1000):
+        """Test multiple cases with Gaussian distributions."""
+        return super().test_multiple_cases(
+            self.get_distribution, epsilon_values, alpha_values, num_samples
+        )
+
+class LogNormalTester(BaseTester):
+    """Tester for LogNormal distributions."""
+    
+    def __init__(self, seed=22):
+        super().__init__(seed)
+        self.dist_type = "lognormal"
+    
+    def get_distribution(self, epsilon):
+        """Get a LogNormal mixture distribution with the given epsilon."""
+        dist1 = LogNormalDistribution(0, 1)
+        dist2_mu = np.log(2 ** (1 / max(epsilon, 0.001)))
+        dist2 = LogNormalDistribution(dist2_mu, 1)
+        return MixtureDistribution(dist1, dist2, p1=(1-epsilon))
+    
+    def test_multiple_cases(self, epsilon_values, alpha_values, num_samples=1000):
+        """Test multiple cases with LogNormal distributions."""
+        return super().test_multiple_cases(
+            self.get_distribution, epsilon_values, alpha_values, num_samples
+        )

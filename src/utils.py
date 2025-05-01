@@ -124,7 +124,6 @@ def plot_revenue_vs_alpha(alphas, revenues, optimal_revenue, distribution_name):
     
     # Add theoretical bound if available (e.g., 1-O(√α) for regular distributions)
 
-    # gaps = [(optimal_revenue - revenues) / (alpha * optimal_revenue)]
     if "regular" in distribution_name.lower():
         plt.plot(alphas, [(1 - np.sqrt(a)) * optimal_revenue for a in alphas], 'g--', label='Theoretical Bound (1-√α)')
     elif "mhr" in distribution_name.lower():
