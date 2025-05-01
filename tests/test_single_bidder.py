@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from src.distributions import UniformDistribution, ProductDistribution, MixtureDistribution
 from src.algorithms import regularized_tester, regularized_learner
 from src.utils import optimal_reserve_price, plot_revenue_vs_alpha
-from src.mechanisms import myerson_auction, vickrey_auction
 
 
 # TODO
@@ -242,56 +241,6 @@ def verify_irregularity(dist, num_points=1000):
     else:
         print("Warning: The distribution might not be irregular!")\
         
-# def plot_revenues_vs_regularity(epsilons):
-#     """
-#     Plot learned and theoretical revenues for various distributions of different regularity.
-#     """
-
-#     learned_revenues = [] # to store learned revenues
-#     optimal_revenues = [] # to store theoretical revenues
-#     for epsilon in epsilons:
-#         # Create the distribution
-#         dist1 = UniformDistribution(0, 1)
-#         dist1_low = 2 ** (1 / epsilon)
-#         dist1_high = dist1_low + 1
-#         dist2 = UniformDistribution(dist1_low, dist1_high)
-#         dist = MixtureDistribution(dist1, dist2, p1=(1-epsilon))
-
-#         # PRINT DISTRIBUTION INFORMATION
-#         print(f"\nDistribution with epsilon={epsilon}:")
-#         print(f"Uniform from 0 to 1 with probability {1-epsilon} and uniform from {dist1_low} to {dist1_high} with probability {epsilon}")
-        
-#         # Generate samples
-#         num_samples = 1000
-#         samples = [dist.sample(num_samples)]
-
-#         # Variety of alpha values
-#         alpha_values = [0.01, 0.05, 0.1, 0.2, 0.5]
-
-#         for alpha in alpha_values:
-#             # Run tester
-#             tester_result = regularized_tester(samples, alpha)
-            
-#             # Run learner
-#             reserve_prices = regularized_learner(samples, alpha)
-            
-#             # Evaluate revenue through simulation
-#             revenue = evaluate_revenue(dist, reserve_prices)
-#             learned_revenues.append(revenue)
-
-#             # Also check what happens with the optimal reserve
-#             optimal_reserve = [dist1_low]
-#             optimal_sim_revenue = evaluate_revenue(dist, optimal_reserve)
-#             optimal_revenue = optimal_reserve_price * epsilon
-#             optimal_revenues.append(optimal_revenue)
-
-#             print(f"\nAlpha = {alpha}:")
-#             print(f"Tester result: {tester_result}")
-#             print(f"Learned reserve price: {reserve_prices[0]:.4f}")
-#             print(f"Estimated revenue: {revenue:.4f}")
-#             print(f"Approximation ratio: {revenue/optimal_revenue:.4f}")
-#             print(f"Simulated revenue with optimal reserve price ({optimal_reserve[0]}): {optimal_sim_revenue:.4f}")
-#             print(f"Theoretical optimal revenue: {optimal_revenue:.4f}")
 
 def plot_revenues_vs_regularity(a=0, b=1, epsilons=[0.01, 0.05, 0.1, 0.2, 0.3], alpha_values=[0.01, 0.05, 0.1, 0.2, 0.3]):
     """
@@ -324,10 +273,7 @@ def plot_revenues_vs_regularity(a=0, b=1, epsilons=[0.01, 0.05, 0.1, 0.2, 0.3], 
 
         safe_epsilon = max(epsilon, 0.001)
         dist2_low = 2 ** (1 / safe_epsilon)
-        # dist2_low = (1 / safe_epsilon) ** 2
         dist2_high = dist2_low + 1
-        
-        # dist2 = UniformDistribution(dist1_low, dist1_high)
         # dist2_low = a
         # dist2_high = b
         dist2 = UniformDistribution(dist2_low, dist2_high)
@@ -337,9 +283,9 @@ def plot_revenues_vs_regularity(a=0, b=1, epsilons=[0.01, 0.05, 0.1, 0.2, 0.3], 
         print(f"\nDistribution with epsilon={epsilon}:")
         print(f"Uniform from 0 to 1 with probability {1-epsilon} and uniform from {dist2_low:.2f} to {dist2_high:.2f} with probability {epsilon}")
         
-        np.random.seed(42)
+        np.random.seed(22)
         # Generate samples
-        num_samples = 1000
+        num_samples = 200000
         samples = [dist.sample(num_samples)]
         
         # Calculate theoretical optimal revenue
@@ -407,7 +353,6 @@ def plot_revenues_vs_regularity(a=0, b=1, epsilons=[0.01, 0.05, 0.1, 0.2, 0.3], 
     
     # Plot the optimal revenue
     ax.plot(epsilons, all_optimal_revenues, 'k--', linewidth=2, label='Theoretical Optimal')
-    # ax.plot(epsilons, all_optimal_sim_revenues, 'r:', linewidth=2, label='Simulated Optimal')
     
     ax.set_title('Revenue vs Epsilon (Degree of Irregularity)')
     ax.set_xlabel('Epsilon (higher = more irregular)')
@@ -490,7 +435,7 @@ def plot_revenues_vs_regularity(a=0, b=1, epsilons=[0.01, 0.05, 0.1, 0.2, 0.3], 
     plt.ylabel('Revenue Ratio (Learned/Optimal)')
     plt.legend()
     plt.grid(True)
-    plt.savefig('plots/revenue_ratio_vs_alpha.png', dpi=300)
+    plt.savefig('revenue_ratio_vs_alpha.png', dpi=300)
     plt.show()
     
     # Return the collected data for further analysis if needed
@@ -504,14 +449,10 @@ def plot_revenues_vs_regularity(a=0, b=1, epsilons=[0.01, 0.05, 0.1, 0.2, 0.3], 
         'reserve_prices': all_reserve_prices,
         'approximation_ratios': all_approximation_ratios
     } 
-     
-
-
     
-
 
 
 if __name__ == "__main__":
     # test_single_bidder_uniform()
     # test_single_bidder_irregular()
-    plot_revenues_vs_regularity(100, 101)
+    plot_revenues_vs_regularity()
